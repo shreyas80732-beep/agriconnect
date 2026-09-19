@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL || '/api',
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -22,7 +22,7 @@ export const detectDisease = (file) => {
   const formData = new FormData();
   formData.append('image', file);
   return axios
-    .post('/api/detect-disease', formData, {
+    .post(`${import.meta.env.VITE_API_URL || '/api'}/detect-disease`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
     .then((r) => r.data);
