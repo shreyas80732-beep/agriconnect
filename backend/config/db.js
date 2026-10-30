@@ -21,8 +21,8 @@ const connectDB = async () => {
       console.log(`Using In-Memory MongoDB connected: ${conn.connection.host}`);
       return conn;
     } catch (memErr) {
-      console.error(`In-Memory MongoDB connection failed: ${memErr.message}`);
-      process.exit(1);
+      console.warn(`In-Memory MongoDB not available in production: ${memErr.message}`);
+      return null;
     }
   };
 
@@ -32,14 +32,18 @@ const connectDB = async () => {
 
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 4000,
+      serverSelectionTimeoutMS: 5000,
     });
     console.log(`MongoDB Connected: ${conn.connection.host}`);
     return conn;
   } catch (error) {
-    console.warn(`Primary MongoDB connection error: ${error.message}`);
-    console.log('Switching to local In-Memory MongoDB automatically for reliability...');
-    return await tryMemoryDB();
+    console.error(`MongoDB connection error: ${error.message}`);
+    // If dev dependencies like mongodb-memory-server are available, fallback; otherwise don't crash the server
+    try {
+      return await tryMemoryDB();
+    } catch (e) {
+      console.warn('Proceeding without in-memory fallback.');
+    }
   }
 };
 
