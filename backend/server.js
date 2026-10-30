@@ -48,6 +48,7 @@ const apiLimiter = rateLimit({
 });
 app.use('/api', apiLimiter);
 
+app.get('/', (req, res) => res.json({ status: 'ok', message: 'AgriConnect API is running smoothly' }));
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));
 
 app.use('/api/auth', authRoutes);
